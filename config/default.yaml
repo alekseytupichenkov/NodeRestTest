@@ -1,0 +1,17 @@
+logger:
+  path: 'runtime/logs'
+db:
+  databaseName: 'dbname'
+  user: 'username'
+  password: 'password'
+  options:
+    dialect: 'sqlite'
+    storage: 'runtime/db/database.sqlite'
+    pool:
+      max: 5
+      min: 0
+      idle: 10000
+server:
+  port: 80
+  jwt:
+    secret: 'my super secret'
