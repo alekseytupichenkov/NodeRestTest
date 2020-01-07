@@ -4,9 +4,30 @@ const enableDestroy = require('server-destroy')
 const helmet = require('helmet')
 const expressJwt = require('express-jwt')
 const cors = require('cors')
+const swaggerJSDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 const securityErrorHandler = require('./middlewares/securityErrorHandler')
 const SecurityController = require('./controllers/SecurityController')
 const TaskController = require('./controllers/TaskController')
+
+const swaggerJSDocConfig = {
+  swaggerDefinition: {
+    info: {
+      title: 'Test application',
+      version: '1.0.0',
+      description: 'A sample API',
+    },
+    securityDefinitions: {
+      Bearer: {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+      },
+    },
+  },
+  apis: ['src/server/controllers/*Controller.js'],
+}
+
 
 module.exports = (container) => {
   const { config, services: { logger } } = container
@@ -26,7 +47,7 @@ module.exports = (container) => {
 
     server.use(bodyParser.urlencoded({ extended: false }))
     server.use(bodyParser.json())
-    server.use(expressJwt(config.server.jwt).unless({ path: ['/login', '/register'] }))
+    server.use(expressJwt(config.server.jwt).unless({ path: ['/login', '/register', /^\/api-docs.*/] }))
     server.use(securityErrorHandler(logger))
 
     server.post('/login', controllers.securityController.loginAction.bind(controllers.securityController))
@@ -36,6 +57,12 @@ module.exports = (container) => {
     server.patch('/task', controllers.taskController.updateAction.bind(controllers.taskController))
     server.delete('/task', controllers.taskController.deleteAction.bind(controllers.taskController))
 
+    const swaggerSpec = swaggerJSDoc(swaggerJSDocConfig)
+    server.get('/api-docs.json', (req, res) => {
+      res.setHeader('Content-Type', 'application/json')
+      res.send(swaggerSpec)
+    })
+    server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
     listener = server.listen(config.server.port, () => {
       logger.info('Server started', { port: config.server.port })

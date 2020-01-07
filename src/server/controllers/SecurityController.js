@@ -10,6 +10,67 @@ class SecurityController extends BaseController {
     this.passwordHasher = passwordHasher
   }
 
+  /**
+   * @swagger
+   * tags:
+   *   name: Security
+   *   description: User registration and login
+   */
+
+  /**
+   * @swagger
+   * definitions:
+   *   Credentials:
+   *     required:
+   *       - email
+   *       - password
+   *     properties:
+   *       email:
+   *         type: string
+   *       password:
+   *         type: string
+   *   ErrorResponse:
+   *     type: object
+   *     properties:
+   *       success:
+   *         type: boolean
+   *       message:
+   *         type: string
+   */
+
+  /**
+   * @swagger
+   * /login:
+   *   post:
+   *     description: Login
+   *     tags: [Security]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: "body"
+   *         name: "body"
+   *         required: true
+   *         type: string
+   *         schema:
+   *           $ref: "#/definitions/Credentials"
+   *     responses:
+   *       200:
+   *         schema:
+   *           type: object
+   *           properties:
+   *             success:
+   *               type: boolean
+   *             message:
+   *               type: string
+   *             data:
+   *               type: object
+   *               properties:
+   *                 token:
+   *                   type: string
+   *       500:
+   *         schema:
+   *           $ref: '#/definitions/ErrorResponse'
+   */
   async loginAction(req, res) {
     const { email, password } = req.body
 
@@ -27,6 +88,41 @@ class SecurityController extends BaseController {
     res.status(401).json(this.createResponse(false, 'Incorrect credentials'))
   }
 
+  /**
+   * @swagger
+   * /register:
+   *   post:
+   *     description: Register new user
+   *     tags: [Security]
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - in: "body"
+   *         name: "body"
+   *         required: true
+   *         type: string
+   *         schema:
+   *           $ref: "#/definitions/Credentials"
+   *     responses:
+   *       200:
+   *         schema:
+   *           type: object
+   *           properties:
+   *             success:
+   *               type: boolean
+   *             message:
+   *               type: string
+   *             data:
+   *               type: object
+   *               properties:
+   *                 token:
+   *                   type: string
+   *                 id:
+   *                   type: integer
+   *       500:
+   *         schema:
+   *           $ref: '#/definitions/ErrorResponse'
+   */
   async registerAction(req, res) {
     const { email, password } = req.body
 

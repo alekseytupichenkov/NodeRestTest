@@ -15,7 +15,9 @@ module.exports = (sequelize, User) => {
     priority: {
       type: Sequelize.ENUM(...priorities),
       validate: {
-        isIn: priorities,
+        isIn: {
+          args: [priorities],
+        } ,
       },
     },
   }, {
